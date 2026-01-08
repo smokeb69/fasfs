@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLOOMCRAWLER RIIS - Control Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+        }
+        .glow {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+        .pulse-glow {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.8); }
+        }
+    </style>
+  </head>
+<body class="text-white">
+    <div class="container mx-auto p-6">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-6xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-500 to-cyan-400 bg-clip-text text-transparent">
+                BLOOMCRAWLER RIIS
+            </h1>
+            <p class="text-2xl text-gray-300 mb-2">Ultimate Full Activation - Advanced Law Enforcement Platform</p>
+            <p class="text-lg text-gray-400">Multi-threaded Distributed Crawling & Intelligence System</p>
+
+            <!-- Status Indicator -->
+            <div class="mt-8 flex justify-center">
+                <div class="bg-gray-800/50 backdrop-blur-sm rounded-lg px-6 py-4 border border-gray-700 glow">
+                    <div class="flex items-center space-x-4 text-sm">
+                        <div class="flex items-center space-x-2">
+                            <div id="backend-status" class="w-3 h-3 rounded-full bg-red-400"></div>
+                            <span>Backend: <span id="backend-text" class="text-red-400">CHECKING</span></span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="cpu" class="w-4 h-4 text-blue-400"></i>
+                            <span>Systems: <span id="systems-count" class="text-blue-400">0/6</span></span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="zap" class="w-4 h-4 text-purple-400"></i>
+                            <span>Swarm: <span id="swarm-status" class="text-gray-400">IDLE</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Control Panels -->
+        <div class="grid md:grid-cols-2 gap-8 mb-12">
+            <!-- Master Dashboard -->
+            <a href="dashboard.html" class="block group">
+                <div class="bg-gradient-to-br from-blue-900/50 to-purple-900/50 backdrop-blur-sm rounded-xl p-8 border border-blue-500/30 hover:border-blue-400/50 transition-all duration-300 glow pulse-glow group-hover:scale-105">
+                    <div class="text-center">
+                        <div class="w-16 h-16 mx-auto mb-6 bg-blue-500/20 rounded-full flex items-center justify-center">
+                            <i data-lucide="shield" class="w-8 h-8 text-blue-400"></i>
+                        </div>
+                        <h2 class="text-3xl font-bold mb-4 text-blue-300">Master Dashboard</h2>
+                        <p class="text-gray-300 mb-6 leading-relaxed">
+                            Unified command center providing real-time monitoring and control of all BLOOMCRAWLER RIIS systems.
+                            Monitor threat detection, swarm crawling, predictive analytics, and system health in one comprehensive view.
+                        </p>
+                        <div class="flex justify-center space-x-4 text-sm text-gray-400">
+                            <div class="flex items-center space-x-1">
+                                <i data-lucide="activity" class="w-4 h-4"></i>
+                                <span>Real-time Updates</span>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+                                <span>System Analytics</span>
+                            </div>
+                        </div>
+                        <div class="mt-6 text-blue-400 font-semibold group-hover:text-blue-300 transition-colors">
+                            Access Master Control →
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Swarm Control -->
+            <a href="swarm-control.html" class="block group">
+                <div class="bg-gradient-to-br from-purple-900/50 to-cyan-900/50 backdrop-blur-sm rounded-xl p-8 border border-purple-500/30 hover:border-purple-400/50 transition-all duration-300 glow pulse-glow group-hover:scale-105">
+                    <div class="text-center">
+                        <div class="w-16 h-16 mx-auto mb-6 bg-purple-500/20 rounded-full flex items-center justify-center">
+                            <i data-lucide="network" class="w-8 h-8 text-purple-400"></i>
+                        </div>
+                        <h2 class="text-3xl font-bold mb-4 text-purple-300">Swarm Control</h2>
+                        <p class="text-gray-300 mb-6 leading-relaxed">
+                            Advanced multi-threaded crawling engine. Configure targets, monitor worker performance,
+                            and control distributed crawling operations across TOR, I2P, and surface networks.
+                        </p>
+                        <div class="flex justify-center space-x-4 text-sm text-gray-400">
+                            <div class="flex items-center space-x-1">
+                                <i data-lucide="cpu" class="w-4 h-4"></i>
+                                <span>Multi-threading</span>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <i data-lucide="target" class="w-4 h-4"></i>
+                                <span>Distributed Crawling</span>
+                            </div>
+                        </div>
+                        <div class="mt-6 text-purple-400 font-semibold group-hover:text-purple-300 transition-colors">
+                            Launch Swarm Control →
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- System Overview -->
+        <div class="bg-gray-800/50 backdrop-blur-sm rounded-xl p-8 border border-gray-700 mb-8">
+            <h2 class="text-3xl font-bold mb-6 text-center text-gray-200">System Overview</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div class="text-center">
+                    <div class="w-12 h-12 mx-auto mb-2 bg-red-500/20 rounded-lg flex items-center justify-center">
+                        <i data-lucide="alert-triangle" class="w-6 h-6 text-red-400"></i>
+                    </div>
+                    <div class="text-sm font-semibold text-gray-300">Threat Detection</div>
+                    <div class="text-xs text-gray-500">Real-time monitoring</div>
+                </div>
+
+                <div class="text-center">
+                    <div class="w-12 h-12 mx-auto mb-2 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                        <i data-lucide="network" class="w-6 h-6 text-blue-400"></i>
+                    </div>
+                    <div class="text-sm font-semibold text-gray-300">Swarm Crawler</div>
+                    <div class="text-xs text-gray-500">Multi-threaded</div>
+                </div>
+
+                <div class="text-center">
+                    <div class="w-12 h-12 mx-auto mb-2 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                        <i data-lucide="zap" class="w-6 h-6 text-yellow-400"></i>
+                    </div>
+                    <div class="text-sm font-semibold text-gray-300">Bloom Engine</div>
+                    <div class="text-xs text-gray-500">Recursive deployment</div>
+                </div>
+
+                <div class="text-center">
+                    <div class="w-12 h-12 mx-auto mb-2 bg-cyan-500/20 rounded-lg flex items-center justify-center">
+                        <i data-lucide="bar-chart-3" class="w-6 h-6 text-cyan-400"></i>
+                    </div>
+                    <div class="text-sm font-semibold text-gray-300">Predictive AI</div>
+                    <div class="text-xs text-gray-500">ML forecasting</div>
+                </div>
+
+                <div class="text-center">
+                    <div class="w-12 h-12 mx-auto mb-2 bg-pink-500/20 rounded-lg flex items-center justify-center">
+                        <i data-lucide="globe" class="w-6 h-6 text-pink-400"></i>
+                    </div>
+                    <div class="text-sm font-semibold text-gray-300">Graph Database</div>
+                    <div class="text-xs text-gray-500">Entity relationships</div>
+                </div>
+
+                <div class="text-center">
+                    <div class="w-12 h-12 mx-auto mb-2 bg-orange-500/20 rounded-lg flex items-center justify-center">
+                        <i data-lucide="cpu" class="w-6 h-6 text-orange-400"></i>
+                    </div>
+                    <div class="text-sm font-semibold text-gray-300">SOAR Automation</div>
+                    <div class="text-xs text-gray-500">Incident response</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700">
+            <h3 class="text-xl font-bold mb-4 text-center text-gray-200">System Status</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div>
+                    <div class="text-2xl font-bold text-green-400" id="uptime">00:00:00</div>
+                    <div class="text-sm text-gray-400">Uptime</div>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold text-blue-400" id="total-items">0</div>
+                    <div class="text-sm text-gray-400">Items Processed</div>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold text-purple-400" id="active-seeds">0</div>
+                    <div class="text-sm text-gray-400">Active Seeds</div>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold text-cyan-400" id="threats-detected">0</div>
+                    <div class="text-sm text-gray-400">Threats Detected</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        let startTime = Date.now();
+
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Format uptime
+        function formatUptime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Update uptime
+        function updateUptime() {
+            const uptime = Math.floor((Date.now() - startTime) / 1000);
+            document.getElementById('uptime').textContent = formatUptime(uptime);
+        }
+
+        // Fetch system status
+        async function fetchSystemStatus() {
+            try {
+                // Check backend health
+                const healthResponse = await fetch('http://localhost:5000/health');
+                const backendStatus = document.getElementById('backend-status');
+                const backendText = document.getElementById('backend-text');
+
+                if (healthResponse.ok) {
+                    backendStatus.className = 'w-3 h-3 rounded-full bg-green-400';
+                    backendText.textContent = 'ONLINE';
+                    backendText.className = 'text-green-400';
+                } else {
+                    backendStatus.className = 'w-3 h-3 rounded-full bg-red-400';
+                    backendText.textContent = 'OFFLINE';
+                    backendText.className = 'text-red-400';
+                }
+
+                // Get system counts
+                let systemsOnline = 0;
+                const systemChecks = [
+                    fetch(`${API_BASE}/threats/live`),
+                    fetch(`${API_BASE}/swarm/stats`),
+                    fetch(`${API_BASE}/bloom/stats`),
+                    fetch(`${API_BASE}/analytics/predictive`),
+                    fetch(`${API_BASE}/graph/stats`),
+                    fetch(`${API_BASE}/soar/stats`)
+                ];
+
+                const results = await Promise.allSettled(systemChecks);
+                systemsOnline = results.filter(result => result.status === 'fulfilled').length;
+
+                document.getElementById('systems-count').textContent = `${systemsOnline}/6`;
+
+                // Get swarm status
+                try {
+                    const swarmResponse = await fetch(`${API_BASE}/swarm/stats`);
+                    const swarmData = await swarmResponse.json();
+                    if (swarmData.success && swarmData.data.activeWorkers > 0) {
+                        document.getElementById('swarm-status').textContent = 'ACTIVE';
+                        document.getElementById('swarm-status').className = 'text-green-400';
+                    } else {
+                        document.getElementById('swarm-status').textContent = 'IDLE';
+                        document.getElementById('swarm-status').className = 'text-gray-400';
+                    }
+                } catch (e) {
+                    document.getElementById('swarm-status').textContent = 'ERROR';
+                    document.getElementById('swarm-status').className = 'text-red-400';
+                }
+
+                // Get some basic stats
+                try {
+                    const [swarmResp, bloomResp, threatResp] = await Promise.allSettled([
+                        fetch(`${API_BASE}/swarm/stats`),
+                        fetch(`${API_BASE}/bloom/stats`),
+                        fetch(`${API_BASE}/threats/live`)
+                    ]);
+
+                    if (swarmResp.status === 'fulfilled') {
+                        const data = await swarmResp.value.json();
+                        document.getElementById('total-items').textContent = (data.data?.itemsFound || 0).toLocaleString();
+                    }
+
+                    if (bloomResp.status === 'fulfilled') {
+                        const data = await bloomResp.value.json();
+                        document.getElementById('active-seeds').textContent = data.data?.activeSeeds || 0;
+                    }
+
+                    if (threatResp.status === 'fulfilled') {
+                        const data = await threatResp.value.json();
+                        document.getElementById('threats-detected').textContent = data.data?.totalThreatsDetected || 0;
+                    }
+                } catch (e) {
+                    console.log('Error fetching stats:', e);
+                }
+
+            } catch (error) {
+                console.error('Failed to fetch system status:', error);
+                document.getElementById('backend-status').className = 'w-3 h-3 rounded-full bg-red-400';
+                document.getElementById('backend-text').textContent = 'OFFLINE';
+                document.getElementById('backend-text').className = 'text-red-400';
+            }
+        }
+
+        // Initialize
+        fetchSystemStatus();
+        updateUptime();
+
+        // Update every 5 seconds
+        setInterval(fetchSystemStatus, 5000);
+        setInterval(updateUptime, 1000);
+
+        // Re-initialize Lucide icons periodically
+        setInterval(() => {
+            lucide.createIcons();
+        }, 1000);
+    </script>
+  </body>
+</html>

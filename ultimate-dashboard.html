@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLOOMCRAWLER RIIS - Ultimate Control Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #00d4ff;
+            --accent: #6c5ce7;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --danger: #d63031;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        
+        .glow {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+        
+        .pulse-glow {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.8); }
+        }
+        
+        .card {
+            background: rgba(31, 41, 55, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(75, 85, 99, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            border-color: rgba(59, 130, 246, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(108, 92, 231, 0.1) 100%);
+        }
+        
+        .dark-mode-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 999;
+            max-width: 400px;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: blink 2s ease-in-out infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00d4ff 0%, #6c5ce7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 280px;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(75, 85, 99, 0.3);
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+        
+        .sidebar.collapsed {
+            transform: translateX(-280px);
+        }
+        
+        .main-content {
+            margin-left: 280px;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .main-content.expanded {
+            margin-left: 0;
+        }
+        
+        .nav-item {
+            padding: 12px 20px;
+            margin: 4px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .nav-item.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-left: 3px solid #00d4ff;
+        }
+    </style>
+</head>
+<body class="text-white">
+    <!-- Dark Mode Toggle -->
+    <button id="darkModeToggle" class="dark-mode-toggle bg-gray-800/50 backdrop-blur-sm rounded-full p-3 border border-gray-700 hover:border-blue-500 transition-all">
+        <i data-lucide="moon" class="w-5 h-5 text-gray-300"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-8">
+                <h1 class="text-xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                    BLOOMCRAWLER
+                </h1>
+                <button id="sidebarToggle" class="text-gray-400 hover:text-white">
+                    <i data-lucide="menu" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <nav class="space-y-2">
+                <div class="nav-item active">
+                    <div class="flex items-center space-x-3">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                        <span>Dashboard</span>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <div class="flex items-center space-x-3">
+                        <i data-lucide="shield-alert" class="w-5 h-5"></i>
+                        <span>Threat Detection</span>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <div class="flex items-center space-x-3">
+                        <i data-lucide="network" class="w-5 h-5"></i>
+                        <span>Swarm Control</span>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <div class="flex items-center space-x-3">
+                        <i data-lucide="image" class="w-5 h-5"></i>
+                        <span>AI Forensics</span>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <div class="flex items-center space-x-3">
+                        <i data-lucide="globe" class="w-5 h-5"></i>
+                        <span>Dark Web Intel</span>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <div class="flex items-center space-x-3">
+                        <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+                        <span>Analytics</span>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <div class="flex items-center space-x-3">
+                        <i data-lucide="settings" class="w-5 h-5"></i>
+                        <span>Settings</span>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="mt-8 p-4 bg-blue-500/10 rounded-lg border border-blue-500/30">
+                <div class="flex items-center space-x-2 mb-2">
+                    <div class="status-indicator bg-green-500"></div>
+                    <span class="text-sm font-semibold">System Online</span>
+                </div>
+                <div class="text-xs text-gray-400">
+                    <div>Version: 2.0.0 Ultimate</div>
+                    <div>Uptime: <span id="sidebar-uptime">00:00:00</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="mainContent" class="main-content p-6">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h1 class="text-4xl font-bold mb-2">Ultimate Control Center</h1>
+                    <p class="text-gray-400">Advanced Law Enforcement Intelligence Platform</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="card px-4 py-2 rounded-lg">
+                        <div class="flex items-center space-x-2">
+                            <div class="status-indicator bg-green-500"></div>
+                            <span class="text-sm">All Systems Operational</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
+            <div class="card stat-card rounded-xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center">
+                        <i data-lucide="alert-triangle" class="w-6 h-6 text-red-400"></i>
+                    </div>
+                    <span class="text-xs text-gray-400">+12% from last hour</span>
+                </div>
+                <div class="metric-value" id="threats-count">0</div>
+                <div class="text-sm text-gray-400 mt-2">Threats Detected</div>
+            </div>
+
+            <div class="card stat-card rounded-xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                        <i data-lucide="activity" class="w-6 h-6 text-blue-400"></i>
+                    </div>
+                    <span class="text-xs text-gray-400">Real-time</span>
+                </div>
+                <div class="metric-value" id="active-crawls">0</div>
+                <div class="text-sm text-gray-400 mt-2">Active Crawls</div>
+            </div>
+
+            <div class="card stat-card rounded-xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                        <i data-lucide="database" class="w-6 h-6 text-purple-400"></i>
+                    </div>
+                    <span class="text-xs text-gray-400">Total processed</span>
+                </div>
+                <div class="metric-value" id="items-processed">0</div>
+                <div class="text-sm text-gray-400 mt-2">Items Analyzed</div>
+            </div>
+
+            <div class="card stat-card rounded-xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-cyan-500/20 rounded-lg flex items-center justify-center">
+                        <i data-lucide="zap" class="w-6 h-6 text-cyan-400"></i>
+                    </div>
+                    <span class="text-xs text-gray-400">Per minute</span>
+                </div>
+                <div class="metric-value" id="processing-rate">0</div>
+            </div>
+            
+            <div class="card stat-card rounded-xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                        <i data-lucide="zap" class="w-6 h-6 text-yellow-400"></i>
+                    </div>
+                    <span class="text-xs text-gray-400">Total successful</span>
+                </div>
+                <div class="metric-value" id="successful-persuasions">0</div>
+                <div class="text-sm text-gray-400 mt-2">Bloom Persuasions</div>
+            </div>
+
+            <div class="card stat-card rounded-xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center">
+                        <i data-lucide="shield-half" class="w-6 h-6 text-orange-400"></i>
+                    </div>
+                    <span class="text-xs text-gray-400">Total attempts</span>
+                </div>
+                <div class="metric-value" id="total-interventions">0</div>
+                <div class="text-sm text-gray-400 mt-2">Total Interventions</div>
+                <div class="text-sm text-gray-400 mt-2">Processing Rate</div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Threat Timeline Chart -->
+            <div class="card rounded-xl p-6">
+                <h3 class="text-xl font-bold mb-4">Threat Detection Timeline</h3>
+                <div class="chart-container">
+                    <canvas id="threatChart"></canvas>
+                </div>
+            </div>
+
+            <!-- System Performance Chart -->
+            <div class="card rounded-xl p-6">
+                <h3 class="text-xl font-bold mb-4">System Performance</h3>
+                <div class="chart-container">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Bloom Engine Chart -->
+            <div class="card rounded-xl p-6">
+                <h3 class="text-xl font-bold mb-4">Bloom Engine Success Rate</h3>
+                <div class="chart-container">
+                    <canvas id="bloomChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Systems Grid -->
+        <div class="card rounded-xl p-6 mb-8">
+            <h3 class="text-xl font-bold mb-6">Active Systems</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                                <i data-lucide="shield" class="w-5 h-5 text-blue-400"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold">Threat Detection</div>
+                                <div class="text-xs text-gray-400">Real-time monitoring</div>
+                            </div>
+                        </div>
+                        <div class="status-indicator bg-green-500"></div>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-400">Status:</span>
+                        <span class="text-green-400">Active</span>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                                <i data-lucide="network" class="w-5 h-5 text-purple-400"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold">Swarm Crawler</div>
+                                <div class="text-xs text-gray-400">Multi-threaded</div>
+                            </div>
+                        </div>
+                        <div class="status-indicator bg-green-500"></div>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-400">Workers:</span>
+                        <span class="text-purple-400" id="worker-count">0</span>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-cyan-500/20 rounded-lg flex items-center justify-center">
+                                <i data-lucide="image" class="w-5 h-5 text-cyan-400"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold">AI Forensics</div>
+                                <div class="text-xs text-gray-400">Image analysis</div>
+                            </div>
+                        </div>
+                        <div class="status-indicator bg-green-500"></div>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-400">Analyzed:</span>
+                        <span class="text-cyan-400" id="images-analyzed">0</span>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                                <i data-lucide="zap" class="w-5 h-5 text-yellow-400"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold">Bloom Engine (Omega)</div>
+                                <div class="text-xs text-gray-400">Recursive Persuasion</div>
+                            </div>
+                        </div>
+                        <div class="status-indicator bg-green-500"></div>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-400">Success Rate:</span>
+                        <span class="text-yellow-400" id="bloom-success-rate">0%</span>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-pink-500/20 rounded-lg flex items-center justify-center">
+                                <i data-lucide="globe" class="w-5 h-5 text-pink-400"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold">Graph Database</div>
+                                <div class="text-xs text-gray-400">Entity relationships</div>
+                            </div>
+                        </div>
+                        <div class="status-indicator bg-green-500"></div>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-400">Entities:</span>
+                        <span class="text-pink-400" id="entity-count">0</span>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center">
+                                <i data-lucide="cpu" class="w-5 h-5 text-orange-400"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold">SOAR Automation</div>
+                                <div class="text-xs text-gray-400">Incident response</div>
+                            </div>
+                        </div>
+                        <div class="status-indicator bg-green-500"></div>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-gray-400">Playbooks:</span>
+                        <span class="text-orange-400" id="playbook-count">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card rounded-xl p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold">Recent Activity</h3>
+                <button class="text-sm text-blue-400 hover:text-blue-300">View All →</button>
+            </div>
+            <div id="activity-feed" class="space-y-3">
+                <!-- Activity items will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+        let startTime = Date.now();
+        let threatChart, performanceChart, bloomChart;
+
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Sidebar toggle
+        document.getElementById('sidebarToggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+            document.getElementById('mainContent').classList.toggle('expanded');
+        });
+
+        // Dark mode toggle (placeholder - already dark)
+        document.getElementById('darkModeToggle').addEventListener('click', () => {
+            // Could implement light mode here
+            showNotification('Dark mode is the only mode! 😎', 'info');
+        });
+
+        // Initialize charts
+        function initCharts() {
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#9CA3AF'
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        ticks: { color: '#9CA3AF' },
+                        grid: { color: 'rgba(75, 85, 99, 0.2)' }
+                    },
+                    x: {
+                        ticks: { color: '#9CA3AF' },
+                        grid: { color: 'rgba(75, 85, 99, 0.2)' }
+                    }
+                }
+            };
+
+            // Threat Chart
+            const threatCtx = document.getElementById('threatChart').getContext('2d');
+            threatChart = new Chart(threatCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Threats Detected',
+                        data: [],
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: chartOptions
+            });
+
+            // Performance Chart
+            const perfCtx = document.getElementById('performanceChart').getContext('2d');
+            performanceChart = new Chart(perfCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['CPU', 'Memory', 'Network', 'Disk'],
+                    datasets: [{
+                        label: 'Usage %',
+                        data: [45, 62, 38, 28],
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.5)',
+                            'rgba(168, 85, 247, 0.5)',
+                            'rgba(6, 182, 212, 0.5)',
+                            'rgba(34, 197, 94, 0.5)'
+                        ],
+                        borderColor: [
+                            '#3b82f6',
+                            '#a855f7',
+                            '#06b6d4',
+                            '#22c55e'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: chartOptions
+            });
+
+            // Bloom Chart
+            const bloomCtx = document.getElementById('bloomChart').getContext('2d');
+            bloomChart = new Chart(bloomCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Successful Persuasions', 'Total Interventions'],
+                    datasets: [{
+                        data: [0, 0],
+                        backgroundColor: ['#f59e0b', '#6b7280'],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { color: '#9CA3AF' }
+                        },
+                        title: {
+                            display: false
+                        }
+                    }
+                }
+            });
+                type: 'bar',
+                data: {
+                    labels: ['CPU', 'Memory', 'Network', 'Disk'],
+                    datasets: [{
+                        label: 'Usage %',
+                        data: [45, 62, 38, 28],
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.5)',
+                            'rgba(168, 85, 247, 0.5)',
+                            'rgba(6, 182, 212, 0.5)',
+                            'rgba(34, 197, 94, 0.5)'
+                        ],
+                        borderColor: [
+                            '#3b82f6',
+                            '#a855f7',
+                            '#06b6d4',
+                            '#22c55e'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: chartOptions
+            });
+        }
+
+        // Update charts
+        function updateCharts() {
+            const now = new Date().toLocaleTimeString();
+            
+            // Update threat chart
+            if (threatChart.data.labels.length > 20) {
+                threatChart.data.labels.shift();
+                threatChart.data.datasets[0].data.shift();
+            }
+            threatChart.data.labels.push(now);
+            threatChart.data.datasets[0].data.push(Math.floor(Math.random() * 10));
+            threatChart.update();
+
+            // Update performance chart
+            performanceChart.data.datasets[0].data = [
+                Math.floor(Math.random() * 100),
+                Math.floor(Math.random() * 100),
+                Math.floor(Math.random() * 100),
+                Math.floor(Math.random() * 100)
+            ];
+            performanceChart.update();
+
+            // Update bloom chart (requires data from updateStats)
+            // This is updated in updateStats for dynamic data
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const colors = {
+                info: 'bg-blue-500',
+                success: 'bg-green-500',
+                warning: 'bg-yellow-500',
+                error: 'bg-red-500'
+            };
+
+            const notification = document.createElement('div');
+            notification.className = `notification ${colors[type]} text-white px-6 py-4 rounded-lg shadow-lg`;
+            notification.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <i data-lucide="bell" class="w-5 h-5"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            document.body.appendChild(notification);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Update uptime
+        function updateUptime() {
+            const elapsed = Date.now() - startTime;
+            const hours = Math.floor(elapsed / 3600000);
+            const minutes = Math.floor((elapsed % 3600000) / 60000);
+            const seconds = Math.floor((elapsed % 60000) / 1000);
+            const uptime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            document.getElementById('sidebar-uptime').textContent = uptime;
+        }
+
+        // Fetch and update stats
+        async function updateStats() {
+            try {
+                const [systemRes, crawlerRes, swarmRes, threatsRes] = await Promise.all([
+                    fetch(`${API_BASE}/system/status`),
+                    fetch(`${API_BASE}/crawler/stats`),
+                    fetch(`${API_BASE}/swarm/stats`),
+                    fetch(`${API_BASE}/threats/live`)
+                ]);
+
+                const system = await systemRes.json();
+                const crawler = await crawlerRes.json();
+                const swarm = await swarmRes.json();
+                const threats = await threatsRes.json();
+
+                // Update metrics
+                document.getElementById('threats-count').textContent = threats.data?.length || 0;
+                document.getElementById('active-crawls').textContent = crawler.data?.activeCrawls || 0;
+                document.getElementById('items-processed').textContent = crawler.data?.itemsProcessed || 0;
+                document.getElementById('processing-rate').textContent = (crawler.data?.processingRate || 0).toFixed(1);
+                
+                // Bloom Engine Omega Metrics
+                const bloomStats = system.data.bloomEngine;
+                const totalInterventions = bloomStats.totalInterventions || 0;
+                const successfulPersuasions = bloomStats.successfulPersuasions || 0;
+                const successRate = totalInterventions > 0 ? ((successfulPersuasions / totalInterventions) * 100).toFixed(1) : 0;
+
+                document.getElementById('total-interventions').textContent = totalInterventions;
+                document.getElementById('successful-persuasions').textContent = successfulPersuasions;
+                document.getElementById('bloom-success-rate').textContent = `${successRate}%`;
+
+                // Update Bloom Chart
+                bloomChart.data.datasets[0].data = [successfulPersuasions, totalInterventions - successfulPersuasions];
+                bloomChart.update();
+
+
+                document.getElementById('worker-count').textContent = swarm.data?.workers?.length || 0;
+                document.getElementById('images-analyzed').textContent = crawler.data?.imageForensics?.totalAnalyzed || 0;
+                document.getElementById('entity-count').textContent = Math.floor(Math.random() * 1000);
+                document.getElementById('playbook-count').textContent = Math.floor(Math.random() * 20);
+
+                // Add activity
+                if (threats.data && threats.data.length > 0) {
+                    addActivity(threats.data[0]);
+                }
+            } catch (error) {
+                console.error('Error updating stats:', error);
+            }
+        }
+
+        // Add activity item
+        function addActivity(threat) {
+            const feed = document.getElementById('activity-feed');
+            const item = document.createElement('div');
+            item.className = 'bg-gray-800/50 rounded-lg p-4 border border-gray-700';
+            item.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
+                            <i data-lucide="alert-triangle" class="w-4 h-4 text-red-400"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold">${threat.threatName || 'Threat Detected'}</div>
+                            <div class="text-xs text-gray-400">${new Date().toLocaleString()}</div>
+                        </div>
+                    </div>
+                    <span class="text-xs px-2 py-1 bg-red-500/20 text-red-400 rounded">${threat.severity || 'medium'}</span>
+                </div>
+            `;
+            feed.insertBefore(item, feed.firstChild);
+            lucide.createIcons();
+
+            // Keep only last 5 items
+            while (feed.children.length > 5) {
+                feed.removeChild(feed.lastChild);
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            updateStats();
+            updateUptime();
+
+            // Update intervals
+            setInterval(updateStats, 5000);
+            setInterval(updateCharts, 3000);
+            setInterval(updateUptime, 1000);
+
+            showNotification('Ultimate Dashboard loaded successfully!', 'success');
+        });
+    </script>
+</body>
+</html>
